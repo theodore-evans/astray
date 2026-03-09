@@ -160,6 +160,10 @@ pub fn show_interactive(scene: &mut Scene, initial_start: (usize, usize), initia
     let mut buffer = rasterize(&drawing, cur_w, cur_h, &vis);
     let mut dirty = false;
 
+    // Toast notification.
+    let mut toast_msg: Option<String> = None;
+    let mut toast_start = std::time::Instant::now();
+
     while window.is_open() && !window.is_key_down(Key::Escape) && !window.is_key_down(Key::Q) {
         let (w, h) = window.get_size();
         if w != cur_w || h != cur_h {
@@ -250,6 +254,9 @@ pub fn show_interactive(scene: &mut Scene, initial_start: (usize, usize), initia
             export_dxf::save_dxf(&drawing, &dxf_path).expect("Failed to write DXF");
             println!("Wrote {}", svg_path.display());
             println!("Wrote {}", dxf_path.display());
+            toast_msg = Some(format!("Saved {shape_name}-{n}.svg + .dxf"));
+            toast_start = std::time::Instant::now();
+            dirty = true;
         }
         prev_s = s_down;
 
@@ -391,7 +398,26 @@ pub fn show_interactive(scene: &mut Scene, initial_start: (usize, usize), initia
                 bx += (text.len() * (5 + 1) * scale) + pad * 2;
             }
 
+            // Toast notification (fades over 2 seconds).
+            if let Some(ref msg) = toast_msg {
+                let elapsed = toast_start.elapsed().as_secs_f32();
+                if elapsed < 2.0 {
+                    let alpha = ((1.0 - elapsed / 2.0) * 255.0) as u32;
+                    let col = (alpha << 24) | 0x44_FF_88;
+                    let tx = cur_w.saturating_sub(msg.len() * (5 + 1) * scale + pad);
+                    let ty = pad + 7 * scale + pad * 2;
+                    draw_text(&mut buffer, cur_w, cur_h, msg, tx, ty, col, scale);
+                } else {
+                    toast_msg = None;
+                }
+            }
+
             dirty = false;
+        }
+
+        // Keep redrawing while toast is active.
+        if toast_msg.is_some() {
+            dirty = true;
         }
 
         window
