@@ -4,6 +4,12 @@ A* pathfinding gone astray. An interactive tool for generating longest non-self-
 
 ## Install
 
+### Quick install (macOS / Linux)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/theodore-evans/astray/main/install.sh | bash
+```
+
 ### Pre-built binaries
 
 Go to [Actions](https://github.com/theodore-evans/astray/actions), click the latest successful build, and download the artifact for your platform:
