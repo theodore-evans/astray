@@ -266,7 +266,7 @@ impl Scene {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let longest = args.iter().any(|a| a == "--longest");
+    let longest = !args.iter().any(|a| a == "--shortest");
     let shape_name = args.iter()
         .position(|a| a == "--shape")
         .and_then(|i| args.get(i + 1))
