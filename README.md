@@ -6,20 +6,22 @@ A* pathfinding gone astray. An interactive tool for generating longest non-self-
 
 ### Pre-built binaries
 
-Download from the latest [Actions build](https://github.com/theodore-evans/astray/actions):
+Go to [Actions](https://github.com/theodore-evans/astray/actions), click the latest successful build, and download the artifact for your platform:
 
-**macOS:**
+- **astray-macos-arm64** — macOS Apple Silicon (M1/M2/M3/M4)
+- **astray-macos-x64** — macOS Intel
+- **astray-linux-x64** — Linux
+
+Then unzip and run:
+
 ```bash
-gh run download -n astray-macos-arm64 --repo theodore-evans/astray  # Apple Silicon
-gh run download -n astray-macos-x64 --repo theodore-evans/astray    # Intel
-chmod +x astray-macos-*
-xattr -d com.apple.quarantine astray-macos-*  # remove Gatekeeper quarantine
+chmod +x astray-*
+./astray-macos-arm64 --shape circle --longest
 ```
 
-**Linux:**
+On macOS you may need to remove the quarantine flag:
 ```bash
-gh run download -n astray-linux-x64 --repo theodore-evans/astray
-chmod +x astray-linux-x64
+xattr -d com.apple.quarantine astray-macos-*
 ```
 
 ### Build from source
