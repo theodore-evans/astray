@@ -1,5 +1,4 @@
 use geo_types::Coord;
-use noise::{NoiseFn, Perlin};
 use pathfinding::prelude::astar;
 
 fn grid_neighbors(
@@ -158,7 +157,6 @@ pub fn find_longest_path(
         if current_greedy.len() >= 2 {
             segments.push(PathSegment { points: current_greedy, is_link: false });
         }
-        current_greedy = Vec::new();
 
         // Find nearest unvisited cell reachable via A* (allowing visited cells).
         // Prefer cells far from the goal to keep the wandering going.
@@ -281,21 +279,6 @@ fn find_nearest_unvisited(
     Some((target, path))
 }
 
-/// Generate a Perlin noise field, returning values in [0, 1] for each grid cell.
-pub fn noise_field(w: usize, h: usize, scale: f64, seed: u32) -> Vec<Vec<f64>> {
-    let perlin = Perlin::new(seed);
-    (0..h)
-        .map(|y| {
-            (0..w)
-                .map(|x| {
-                    let val = perlin.get([x as f64 * scale, y as f64 * scale]);
-                    (val + 1.0) / 2.0 // normalize to [0, 1]
-                })
-                .collect()
-        })
-        .collect()
-}
-
 /// Grid coordinates to world-space polyline points.
 pub fn grid_to_coords(
     path: &[(usize, usize)],
@@ -310,71 +293,3 @@ pub fn grid_to_coords(
         .collect()
 }
 
-/// L-system string rewriting (for fractals like Koch, Hilbert, etc.).
-pub fn l_system(axiom: &str, rules: &[(char, &str)], iterations: usize) -> String {
-    let mut current = axiom.to_string();
-    for _ in 0..iterations {
-        let mut next = String::with_capacity(current.len() * 2);
-        for ch in current.chars() {
-            if let Some((_, replacement)) = rules.iter().find(|(c, _)| *c == ch) {
-                next.push_str(replacement);
-            } else {
-                next.push(ch);
-            }
-        }
-        current = next;
-    }
-    current
-}
-
-/// Interpret a turtle-graphics string into polyline points.
-/// F = forward, + = turn left, - = turn right, [ = push, ] = pop.
-pub fn turtle(
-    commands: &str,
-    step: f64,
-    angle_deg: f64,
-    origin: Coord<f64>,
-) -> Vec<Vec<Coord<f64>>> {
-    let angle_rad = angle_deg.to_radians();
-    let mut x = origin.x;
-    let mut y = origin.y;
-    let mut heading: f64 = 0.0;
-    let mut stack: Vec<(f64, f64, f64)> = Vec::new();
-    let mut segments: Vec<Vec<Coord<f64>>> = Vec::new();
-    let mut current_line: Vec<Coord<f64>> = vec![Coord { x, y }];
-
-    for ch in commands.chars() {
-        match ch {
-            'F' => {
-                x += heading.cos() * step;
-                y += heading.sin() * step;
-                current_line.push(Coord { x, y });
-            }
-            '+' => heading += angle_rad,
-            '-' => heading -= angle_rad,
-            '[' => {
-                stack.push((x, y, heading));
-                if current_line.len() >= 2 {
-                    segments.push(std::mem::take(&mut current_line));
-                }
-                current_line = vec![Coord { x, y }];
-            }
-            ']' => {
-                if current_line.len() >= 2 {
-                    segments.push(std::mem::take(&mut current_line));
-                }
-                if let Some((sx, sy, sh)) = stack.pop() {
-                    x = sx;
-                    y = sy;
-                    heading = sh;
-                }
-                current_line = vec![Coord { x, y }];
-            }
-            _ => {}
-        }
-    }
-    if current_line.len() >= 2 {
-        segments.push(current_line);
-    }
-    segments
-}

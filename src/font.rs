@@ -102,9 +102,3 @@ pub fn draw_text(buf: &mut [u32], buf_w: usize, buf_h: usize, text: &str, px: us
         cx += (GLYPH_W + 1) * scale;
     }
 }
-
-/// Returns the pixel width of rendered text.
-pub fn text_width(text: &str, scale: usize) -> usize {
-    if text.is_empty() { return 0; }
-    text.len() * (GLYPH_W + 1) * scale - scale
-}

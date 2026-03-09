@@ -4,8 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-# Geometry primitives & operations
-geo = "0.28"
+# Geometry primitives
 geo-types = "0.7"
 
 # SVG output (preview + laser cutting)
@@ -16,12 +15,6 @@ dxf = "0.6"
 
 # Pathfinding algorithms (A*, Dijkstra, BFS, etc.)
 pathfinding = "4"
-
-# Procedural noise (Perlin, Simplex, etc.)
-noise = "0.9"
-
-# Random number generation
-rand = "0.8"
 
 # CLI argument parsing
 clap = { version = "4", features = ["derive"] }

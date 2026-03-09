@@ -354,7 +354,6 @@ pub fn show_interactive(scene: &mut Scene, initial_start: (usize, usize), initia
             buffer = rasterize(&drawing, cur_w, cur_h, &vis);
             // Draw HUD overlay.
             let dim = 0x55_99_99_99u32; // gray
-            let bright = 0xFF_CC_CC_CCu32; // white-ish
             let active = 0xFF_FF_CC_44u32; // yellow highlight
             let scale = 2;
             let pad = 6;
